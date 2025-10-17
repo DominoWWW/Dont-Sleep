@@ -1,5 +1,6 @@
 execute as @s[nbt={SleepTimer:2s}] run title @s subtitle {"text":"Someone needs the night!","color":"light_purple"}
 execute as @s[nbt={SleepTimer:2s}] run title @s title ""
+execute as @s[nbt={SleepTimer:2s}] run tellraw @a [{"selector":"@s","color":"light_purple"},{"text":" is trying to sleep!","color":"light_purple"}]
 execute as @s[nbt={SleepTimer:5s}] run playsound block.bell.use master @s ~ ~ ~ 1 1 1
 execute as @s[nbt={SleepTimer:10s}] run playsound block.bell.use master @s ~ ~ ~ 1 1 1
 execute as @s[nbt={SleepTimer:15s}] run playsound block.bell.use master @s ~ ~ ~ 1 1 1
