@@ -22,7 +22,7 @@ Run the command `/function dont_sleep:uninstall` and delete the zip file.
 #### Commands:
 | Command | Descriptions |
 | --- | --- |
-| ```/function individual_keepinventory:uninstall``` | Uninstalls datapack |
+| ```/function dont_sleep:uninstall``` | Uninstalls datapack |
 
 
 ## Preview
