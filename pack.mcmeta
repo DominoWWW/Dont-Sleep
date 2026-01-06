@@ -1,9 +1,0 @@
-{
-	"pack": {
-		"description": ["",{"text":"Allows players to remind people not to sleep","color":"yellow"},{"text":"\nby DominoWWW","color":"gold","italic":true}],
-		"pack_format": 48,
-		"supported_formats": [48, 81],
-		"min_format": [88, 0],
-		"max_format": [88, 0]
-    }
-}
