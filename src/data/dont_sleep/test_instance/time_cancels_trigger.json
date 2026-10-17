@@ -1,0 +1,6 @@
+{
+    "type": "block_based",
+    "environment": "dont_sleep:time_cancels_trigger/all_of",
+    "structure": "dont_sleep:test/time_cancels_trigger",
+    "max_ticks": 100
+}

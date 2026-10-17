@@ -1,0 +1,7 @@
+{
+    "type": "all_of",
+    "definitions": [
+        "dont_sleep:make_night",
+        "dont_sleep:time_cancels_trigger/env"
+    ]
+}

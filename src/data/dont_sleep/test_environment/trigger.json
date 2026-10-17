@@ -1,0 +1,4 @@
+{
+    "type": "function",
+    "teardown": "dont_sleep:test/trigger"
+}

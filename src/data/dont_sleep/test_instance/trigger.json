@@ -1,0 +1,6 @@
+{
+    "type": "block_based",
+    "environment": "dont_sleep:trigger",
+    "structure": "dont_sleep:test/trigger",
+    "max_ticks": 100
+}

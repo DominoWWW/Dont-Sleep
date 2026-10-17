@@ -1,15 +1,15 @@
 {
     "name": "Dont Sleep",
     "author": "DominoWWW",
-    "version": "1.1",
+    "version": "1.2",
     "require": [
         "bolt"
     ],
     "data_pack": {
-        "name": "Dont-Sleep_v1.1",
+        "name": "Dont-Sleep",
         "description": [{"text":"Allows players to remind others not to sleep.","color":"gold"},{"text":"\nby DominoWWW","italic":true,"color":"yellow"}],
-        "min_format": [88],
-        "max_format": [94, 1],
+        "min_format": [121, 0],
+        "max_format": [121, 0],
 
         "zipped": false,
         "load": ["src"]

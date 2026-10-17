@@ -1,0 +1,7 @@
+Name: Dont-Sleep
+version: 1.2.0
+minecraft_version: 26.1-26.3
+notes: |
+  - Added support for Minecraft 26.1+
+  - Added a automatic testing environment for developing
+  - Updated the github workflow to be more generic and easier to use

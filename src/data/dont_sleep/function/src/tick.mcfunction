@@ -16,7 +16,7 @@ if data storage dont_sleep:data {enabled:1b}:
                 execute as @s[nbt={SleepTimer:2s}] run title @s subtitle {"text":"Someone needs the night!","color":"light_purple"}
                 execute as @s[nbt={SleepTimer:2s}] run title @s title ""
                 for i in range(5, 100, 5):
-                    if entity @s[nbt={SleepTimer:Short(Short(i))}] run playsound block.bell.use master @s ~ ~ ~ 1 1 1
+                    if entity @s[nbt={SleepTimer:Short(i)}] run playsound block.bell.use master @s ~ ~ ~ 1 1 1
 
         # Check if the player has triggered the Dont_Sleep
         unless score @s Dont_Sleep matches 0:
@@ -41,7 +41,7 @@ if data storage dont_sleep:data {enabled:1b}:
         if score @s ds.leaveReset matches 1..:
             tag @s remove ds.triggered
             scoreboard players set @s ds.leaveReset 0
-    store result score $time Dont_Sleep run time query daytime
+    store result score $time Dont_Sleep run time query minecraft:day
     if score $time Dont_Sleep matches 0:
         scoreboard players set @a Dont_Sleep 0
         tag @a remove ds.triggered

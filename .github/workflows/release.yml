@@ -6,22 +6,72 @@ on:
     branches:
       - main
 
-env:
-  VERSION: 1.0.0
-  MINECRAFT_VERSION: 1.21-1.21.10
-  NOTES: |
-    - Initial release.
+permissions:
+  contents: write
 
 jobs:
   zip-and-release:
     runs-on: ubuntu-latest
     steps:
-      - name: 🤐 Zip
+      - name: 🤐 Zip Datapack
         uses: actions/checkout@v2
+      - name: Load release metadata
+        run: |
+          ruby <<'RUBY'
+          require "yaml"
+
+          metadata = YAML.load_file("release.yml")
+          File.open(ENV.fetch("GITHUB_ENV"), "a") do |env|
+            env.puts "RELEASE_NAME=#{metadata.fetch("Name")}"
+            env.puts "VERSION=#{metadata.fetch("version")}"
+            env.puts "MINECRAFT_VERSION=#{metadata.fetch("minecraft_version")}"
+            env.puts "NOTES<<EOF"
+            env.write(metadata.fetch("notes"))
+            env.puts unless metadata.fetch("notes").end_with?("\n")
+            env.puts "EOF"
+          end
+          RUBY
+      - name: Remove test files
+        run: |
+          rm -rf \
+            build/Dont-Sleep/data/dont_sleep/function/test \
+            build/Dont-Sleep/data/dont_sleep/structure/test \
+            build/Dont-Sleep/data/dont_sleep/test_environment \
+            build/Dont-Sleep/data/dont_sleep/test_instance
       - uses: vimtor/action-zip@v1.2
         with:
-          files: /
-          dest: ${{ github.event.repository.name }}_v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}.zip
+          files: /build/dont_sleep/
+          dest: ${{ env.RELEASE_NAME }}_v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}.zip
+      - name: Delete existing release
+        uses: actions/github-script@v7
+        env:
+          RELEASE_TAG: v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const tag = process.env.RELEASE_TAG;
+
+            try {
+              const release = await github.rest.repos.getReleaseByTag({
+                owner,
+                repo,
+                tag,
+              });
+
+              core.info(`Deleting existing release ${release.data.id} for ${tag}`);
+              await github.rest.repos.deleteRelease({
+                owner,
+                repo,
+                release_id: release.data.id,
+              });
+            } catch (error) {
+              if (error.status === 404) {
+                core.info(`No existing release found for ${tag}`);
+              } else {
+                throw error;
+              }
+            }
       - name: 🫸Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -29,7 +79,7 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
             tag_name: 'v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}'
-            release_name: '${{ github.event.repository.name }} v${{ env.VERSION }} ${{ env.MINECRAFT_VERSION }}'
+          release_name: '${{ env.RELEASE_NAME }} v${{ env.VERSION }} ${{ env.MINECRAFT_VERSION }}'
             body: '${{ env.NOTES }}'
       - name: ⬆️ Upload Release Asset
         id: upload-release-asset 
@@ -38,6 +88,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ github.event.repository.name }}_v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}.zip
-          asset_name: ${{ github.event.repository.name }}_v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}.zip
+          asset_path: ./${{ env.RELEASE_NAME }}_v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}.zip
+          asset_name: ${{ env.RELEASE_NAME }}_v${{ env.VERSION }}_${{ env.MINECRAFT_VERSION }}.zip
           asset_content_type: application/zip
