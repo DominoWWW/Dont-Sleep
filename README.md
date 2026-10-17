@@ -46,12 +46,9 @@ Build the datapack with:
 beet build
 ```
 
-Replace `World Name` with the name of your world, then run `/reload`. Run the
-tests from the in-game chat:
-
 ##### Testing
-**Individual Tests:**
-You need [carpet mod](https://modrinth.com/mod/carpet) installed for tests. 
+**Individual Tests:** \
+You need [carpet mod](https://modrinth.com/mod/carpet) installed to run the tests. 
 
 ```commands
 /test run dont_sleep:trigger
@@ -60,7 +57,7 @@ You need [carpet mod](https://modrinth.com/mod/carpet) installed for tests.
 /test run dont_sleep:leave_cancels_trigger
 ```
 
-**Run test server:**
+**Run test server:** \
 You need [carpet mod](https://modrinth.com/mod/carpet) and [GameTest Fabric](https://modrinth.com/mod/gametest-fabric) installed on a fabric server
 Test server start command:
 ```sh
