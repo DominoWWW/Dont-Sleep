@@ -32,6 +32,10 @@ jobs:
             output.puts "EOF"
           end
           RUBY
+      - name: Build datapack
+        run: |
+          python -m pip install beet bolt
+          beet build
       - name: Remove test files
         run: |
           rm -rf \
