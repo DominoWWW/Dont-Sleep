@@ -41,7 +41,7 @@ if data storage dont_sleep:data {enabled:1b}:
         if score @s ds.leaveReset matches 1..:
             tag @s remove ds.triggered
             scoreboard players set @s ds.leaveReset 0
-    store result score $time Dont_Sleep run time query minecraft:day
+    store result score $time Dont_Sleep run time query day
     if score $time Dont_Sleep matches 0:
         scoreboard players set @a Dont_Sleep 0
         tag @a remove ds.triggered
