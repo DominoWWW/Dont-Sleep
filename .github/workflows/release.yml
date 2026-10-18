@@ -37,17 +37,20 @@ jobs:
           python -m pip install beet bolt
           beet build
       - name: Remove test files
+        env:
+          DATAPACK_PATH: build/${{ steps.metadata.outputs.RELEASE_NAME }}
         run: |
           rm -rf \
-            build/Dont-Sleep/data/dont_sleep/function/test \
-            build/Dont-Sleep/data/dont_sleep/structure/test \
-            build/Dont-Sleep/data/dont_sleep/test_environment \
-            build/Dont-Sleep/data/dont_sleep/test_instance
+            "$DATAPACK_PATH/data/dont_sleep/function/test" \
+            "$DATAPACK_PATH/data/dont_sleep/structure/test" \
+            "$DATAPACK_PATH/data/dont_sleep/test_environment" \
+            "$DATAPACK_PATH/data/dont_sleep/test_instance"
       - name: Zip datapack
         env:
+          DATAPACK_PATH: build/${{ steps.metadata.outputs.RELEASE_NAME }}
           ASSET_PATH: ${{ steps.metadata.outputs.RELEASE_NAME }}_v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}.zip
         run: |
-          cd build/Dont-Sleep
+          cd "$DATAPACK_PATH"
           zip -r "../../$ASSET_PATH" .
       - name: Delete existing release
         env:
