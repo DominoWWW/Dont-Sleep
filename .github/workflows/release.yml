@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🤐 Zip Datapack
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       - name: Load release metadata
         id: metadata
         run: |
@@ -39,56 +39,28 @@ jobs:
             build/Dont-Sleep/data/dont_sleep/structure/test \
             build/Dont-Sleep/data/dont_sleep/test_environment \
             build/Dont-Sleep/data/dont_sleep/test_instance
-      - uses: vimtor/action-zip@v1.2
-        with:
-          files: /build/dont_sleep/
-          dest: ${{ steps.metadata.outputs.RELEASE_NAME }}_v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}.zip
+      - name: Zip datapack
+        env:
+          ASSET_PATH: ${{ steps.metadata.outputs.RELEASE_NAME }}_v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}.zip
+        run: |
+          cd build/Dont-Sleep
+          zip -r "../../$ASSET_PATH" .
       - name: Delete existing release
-        uses: actions/github-script@v7
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { owner, repo } = context.repo;
-            const tag = process.env.RELEASE_TAG;
-
-            try {
-              const release = await github.rest.repos.getReleaseByTag({
-                owner,
-                repo,
-                tag,
-              });
-
-              core.info(`Deleting existing release ${release.data.id} for ${tag}`);
-              await github.rest.repos.deleteRelease({
-                owner,
-                repo,
-                release_id: release.data.id,
-              });
-            } catch (error) {
-              if (error.status === 404) {
-                core.info(`No existing release found for ${tag}`);
-              } else {
-                throw error;
-              }
-            }
-      - name: 🫸Create Release
-        id: create_release
-        uses: actions/create-release@v1
+        run: |
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release delete "$RELEASE_TAG" --yes
+          fi
+      - name: Create and upload release
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            tag_name: 'v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}'
-            release_name: '${{ steps.metadata.outputs.RELEASE_NAME }} v${{ steps.metadata.outputs.VERSION }} ${{ steps.metadata.outputs.MINECRAFT_VERSION }}'
-            body: '${{ steps.metadata.outputs.NOTES }}'
-      - name: ⬆️ Upload Release Asset
-        id: upload-release-asset 
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./${{ steps.metadata.outputs.RELEASE_NAME }}_v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}.zip
-          asset_name: ${{ steps.metadata.outputs.RELEASE_NAME }}_v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}.zip
-          asset_content_type: application/zip
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ASSET_PATH: ${{ steps.metadata.outputs.RELEASE_NAME }}_v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}.zip
+          RELEASE_NAME: ${{ steps.metadata.outputs.RELEASE_NAME }}
+          RELEASE_NOTES: ${{ steps.metadata.outputs.NOTES }}
+          RELEASE_TAG: v${{ steps.metadata.outputs.VERSION }}_${{ steps.metadata.outputs.MINECRAFT_VERSION }}
+        run: |
+          gh release create "$RELEASE_TAG" "$ASSET_PATH" \
+            --title "$RELEASE_NAME v${{ steps.metadata.outputs.VERSION }} ${{ steps.metadata.outputs.MINECRAFT_VERSION }}" \
+            --notes "$RELEASE_NOTES"
