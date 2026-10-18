@@ -40,11 +40,13 @@ jobs:
         env:
           DATAPACK_PATH: build/${{ steps.metadata.outputs.RELEASE_NAME }}
         run: |
+          NAMESPACE=$(find "$DATAPACK_PATH/data" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | head -n 1)
+          test -n "$NAMESPACE"
           rm -rf \
-            "$DATAPACK_PATH/data/dont_sleep/function/test" \
-            "$DATAPACK_PATH/data/dont_sleep/structure/test" \
-            "$DATAPACK_PATH/data/dont_sleep/test_environment" \
-            "$DATAPACK_PATH/data/dont_sleep/test_instance"
+            "$DATAPACK_PATH/data/$NAMESPACE/function/test" \
+            "$DATAPACK_PATH/data/$NAMESPACE/structure/test" \
+            "$DATAPACK_PATH/data/$NAMESPACE/test_environment" \
+            "$DATAPACK_PATH/data/$NAMESPACE/test_instance"
       - name: Zip datapack
         env:
           DATAPACK_PATH: build/${{ steps.metadata.outputs.RELEASE_NAME }}
